@@ -1,1 +1,200 @@
-
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comment Killer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-[#09090b] text-gray-300 p-4 md:p-8 font-sans selection:bg-rose-500/30">
+    <div class="max-w-7xl mx-auto space-y-6">
+        <header class="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-[#121214] p-6 md:px-8 md:py-6 rounded-2xl border border-gray-800/60 shadow-2xl shadow-black/50">
+            <div>
+                <h1 class="text-3xl font-extrabold flex items-center gap-3 tracking-tight">
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-red-600">
+                        Comment Killer
+                    </span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-rose-600">
+                        <path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21" />
+                        <path d="M22 21H7" />
+                        <path d="m5 11 9 9" />
+                    </svg>
+                </h1>
+                <p class="text-sm text-gray-500 mt-2 font-medium tracking-wide">
+                    HTML / CSS / JS のコメント（&lt;!-- --&gt;, , 
+                </p>
+            </div>
+            <div class="flex flex-wrap items-center gap-4">
+                <label class="flex items-center gap-2 cursor-pointer text-sm font-medium text-gray-400 hover:text-gray-200 bg-[#18181b] px-4 py-2.5 rounded-lg border border-gray-700/50 transition-colors">
+                    <input 
+                        type="checkbox" 
+                        id="remove-empty-lines"
+                        checked
+                        class="w-4 h-4 text-rose-600 bg-gray-900 border-gray-600 rounded focus:ring-rose-600 focus:ring-offset-gray-900 accent-rose-600"
+                    />
+                    空行を詰める
+                </label>
+                <button 
+                    id="btn-process"
+                    disabled
+                    class="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-rose-600 to-red-700 hover:from-rose-500 hover:to-red-600 disabled:from-gray-700 disabled:to-gray-800 disabled:text-gray-500 text-white font-bold rounded-lg shadow-lg shadow-rose-900/20 transition-all active:scale-95 border border-red-500/30 disabled:border-transparent"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                    </svg>
+                    EXECUTE
+                </button>
+            </div>
+        </header>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="flex flex-col bg-[#121214] rounded-2xl shadow-xl border border-gray-800/60 overflow-hidden">
+                <div class="flex items-center justify-between px-5 py-3.5 bg-[#18181b] border-b border-gray-800">
+                    <span class="font-bold text-gray-300 text-sm tracking-wider">INPUT SOURCE</span>
+                    <div class="flex gap-3">
+                        <button 
+                            id="btn-sample"
+                            class="text-xs px-3 py-1.5 text-gray-400 hover:text-cyan-400 hover:bg-cyan-950/30 rounded-md transition-colors border border-transparent hover:border-cyan-900/50 font-medium"
+                        >
+                            Load Sample
+                        </button>
+                        <button 
+                            id="btn-clear"
+                            class="text-xs px-3 py-1.5 text-gray-400 hover:text-rose-400 hover:bg-rose-950/30 rounded-md transition-colors flex items-center gap-1.5 border border-transparent hover:border-rose-900/50 font-medium"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 6h18" />
+                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                            </svg>
+                            Clear
+                        </button>
+                    </div>
+                </div>
+                <textarea
+                    id="input-code"
+                    placeholder="ここにターゲットとなるコードをペースト..."
+                    class="w-full h-[65vh] p-5 font-mono text-sm leading-relaxed resize-none focus:outline-none focus:ring-1 focus:ring-rose-500/50 bg-[#0a0a0c] text-gray-300 placeholder-gray-700"
+                    spellcheck="false"
+                ></textarea>
+            </div>
+            <div class="flex flex-col bg-[#121214] rounded-2xl shadow-xl border border-gray-800/60 overflow-hidden relative">
+                <div class="flex items-center justify-between px-5 py-3.5 bg-[#18181b] border-b border-gray-800">
+                    <span class="font-bold text-gray-300 text-sm tracking-wider">OUTPUT RESULT</span>
+                    <button 
+                        id="btn-copy"
+                        disabled
+                        class="flex items-center gap-2 text-xs px-4 py-1.5 bg-[#27272a] hover:bg-[#3f3f46] disabled:opacity-50 text-gray-200 rounded-md transition-colors border border-gray-700/50 font-medium"
+                    >
+                        <span id="copy-icon-container">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                            </svg>
+                        </span>
+                        <span id="copy-text">Copy Code</span>
+                    </button>
+                </div>
+                <textarea
+                    id="output-code"
+                    readonly
+                    placeholder="消去されたクリーンなコードがここに生成されます"
+                    class="w-full h-[65vh] p-5 font-mono text-sm leading-relaxed resize-none focus:outline-none bg-[#0a0a0c] text-emerald-400 placeholder-gray-700"
+                    spellcheck="false"
+                ></textarea>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputCode = document.getElementById('input-code');
+            const outputCode = document.getElementById('output-code');
+            const removeEmptyLines = document.getElementById('remove-empty-lines');
+            const btnProcess = document.getElementById('btn-process');
+            const btnCopy = document.getElementById('btn-copy');
+            const btnClear = document.getElementById('btn-clear');
+            const btnSample = document.getElementById('btn-sample');
+            const copyIconContainer = document.getElementById('copy-icon-container');
+            const copyText = document.getElementById('copy-text');
+            const sampleCodeText = `/* =========================================================
+   Comment Killer サンプルコード
+   ========================================================= */
+function initKillerMode() {
+    // ターゲットを捕捉
+    lockOnTarget();
+}
+<!-- 不要なメッセージコンテナ -->
+<div id="target-container"></div>
+.weapon {
+    color: #ff0033; /* 危険な色 */
+    background-image: url("https://example.com/target.png"); // 背景
+}`;
+            const icons = {
+                copy: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2" /><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></svg>`,
+                check: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400"><path d="M20 6 9 17l-5-5" /></svg>`
+            };
+            const updateButtonsState = () => {
+                btnProcess.disabled = inputCode.value.trim() === '';
+                btnCopy.disabled = outputCode.value === '';
+            };
+            inputCode.addEventListener('input', updateButtonsState);
+            btnProcess.addEventListener('click', () => {
+                const text = inputCode.value;
+                if (!text) return;
+                try {
+                    const protectPattern = String.raw`(url\([^)]*\)|"(?:\\.|[^"\\\r\n])*"|'(?:\\.|[^'\\\r\n])*'|\`(?:\\.|[^\`\\])*\`)`;
+                    const htmlComment = String.raw`<!--[\s\S]*?-->`;
+                    const blockComment = String.raw`/\*[\s\S]*?\*/`;
+                    const lineComment = String.raw`/[/].*`;
+                    const removePattern = `(${htmlComment}|${blockComment}|${lineComment})`;
+                    const regex = new RegExp(`${protectPattern}|${removePattern}`, 'g');
+                    let result = text.replace(regex, (match, keepGroup, removeGroup) => {
+                        if (keepGroup) return keepGroup;
+                        if (removeGroup) return '';
+                        return match;
+                    });
+                    if (removeEmptyLines.checked) {
+                        result = result.replace(/^[ \t　]*[\r\n]/gm, '');
+                    }
+                    outputCode.value = result;
+                    copyIconContainer.innerHTML = icons.copy;
+                    copyText.textContent = 'Copy Code';
+                    updateButtonsState();
+                } catch (error) {
+                    console.error("処理中にエラーが発生しました:", error);
+                    alert("コードの解析に失敗しました。");
+                }
+            });
+            btnCopy.addEventListener('click', () => {
+                if (!outputCode.value) return;
+                const textArea = document.createElement("textarea");
+                textArea.value = outputCode.value;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    copyIconContainer.innerHTML = icons.check;
+                    copyText.textContent = 'Copied!';
+                    setTimeout(() => {
+                        copyIconContainer.innerHTML = icons.copy;
+                        copyText.textContent = 'Copy Code';
+                    }, 2000);
+                } catch (err) {
+                    console.error('コピーに失敗しました', err);
+                }
+                document.body.removeChild(textArea);
+            });
+            btnClear.addEventListener('click', () => {
+                if (window.confirm('入力内容と出力結果をすべてクリアしますか？')) {
+                    inputCode.value = '';
+                    outputCode.value = '';
+                    updateButtonsState();
+                }
+            });
+            btnSample.addEventListener('click', () => {
+                inputCode.value = sampleCodeText;
+                updateButtonsState();
+            });
+        });
+    </script>
+</body>
+</html>
